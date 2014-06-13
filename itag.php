@@ -157,7 +157,7 @@ else {
 			
 	if($_SERVER['REQUEST_METHOD'] == 'GET') {
 		$http_param = $_REQUEST;
-	} elseif($_SERVER['REQUEST_METHOD'] == 'PUT') {
+	} elseif($_SERVER['REQUEST_METHOD'] == 'POST') {
 		parse_str(file_get_contents("php://input"),$http_param);
 	}
     
@@ -170,7 +170,6 @@ else {
         'landcover' => trueOrFalse($http_param['landcover']),
         'regions' => trueOrFalse($http_param['regions']),
     	'french' => trueOrFalse($http_param['french'])
-    	
     );
 
     // Options
