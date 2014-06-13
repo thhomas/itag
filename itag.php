@@ -160,7 +160,7 @@ else {
 	} elseif($_SERVER['REQUEST_METHOD'] == 'POST') {
 		parse_str(file_get_contents("php://input"),$http_param);
 	}
-    
+	    
     $keywords = array(
         'countries' => trueOrFalse($http_param['countries']),
         'continents' => trueOrFalse($http_param['continents']),

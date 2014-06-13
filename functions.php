@@ -1240,6 +1240,7 @@ function getFrenchPolitical($dbh, $isShell, $footprint, $keywords, $options) {
 	// Regions
 	$result['regions'] = getRegions($dbh, $isShell, $footprint);
 	$result['states'] = getDepartements($dbh, $isShell, $footprint);
+	$result['arrondissements'] = getArrondissements($dbh, $isShell, $footprint);
 	
 	// Cities
 	$result['cities'] = getCommunes($dbh, $isShell, $footprint);
@@ -1319,8 +1320,8 @@ function getDepartements($dbh, $isShell, $footprint) {
 	if(!$results) {
 		error($dbh, $isShell, "\nFATAL : database connection error\n\n");
 	}
-	$result = array_unique(pg_fetch_all($results), SORT_REGULAR);
-	
+	$result = array_values(array_unique(pg_fetch_all($results), SORT_REGULAR));
+		
 	if($result == false) {
 		$query = "SELECT distinct(admin2) as nom_dept, admin2 as code_dept FROM geoname WHERE st_intersects(geom, ST_GeomFromText('" . $footprint . "', 4326))";
 		$results = pg_query($dbh, $query);
@@ -1357,8 +1358,11 @@ function getRegions($dbh, $isShell, $footprint) {
 	if(!$results) {
 		error($dbh, $isShell, "\nFATAL : database connection error\n\n");
 	}
-	$result = array_unique(pg_fetch_all($results), SORT_REGULAR);
-		
+	$result = array_values(array_unique(pg_fetch_all($results), SORT_REGULAR));
+
+	print_r($result);
+	
+	
 	if($result == false) {
 		$query = "SELECT distinct(admin1) as nom_region, admin1 as code_region FROM geoname WHERE st_intersects(geom, ST_GeomFromText('" . $footprint . "', 4326))";
 		$results = pg_query($dbh, $query);
@@ -1382,7 +1386,7 @@ function getRegions($dbh, $isShell, $footprint) {
  *
  */
 function getArrondissements($dbh, $isShell, $footprint) {
-	$query = "SELECT record.nom_chf, record.code_arr, record.area, record.coverageratio from (SELECT distinct nom_chf, code_arr, ST_Area(geom) as area, round((ST_Area(ST_Intersection(geom, ST_GeomFromText('" . $footprint . "', 4326)))/ST_Area(geom))::numeric, 2) as coverageratio from arrsfrance order by coverageratio desc, area desc) as record where coverageratio > 0";
+	$query = "SELECT r.nom_chf, r.code_arr from arrsfrance as r where st_intersects(r.geom, ST_GeomFromText('" . $footprint . "', 4326)) order by st_area(st_intersection(r.geom, ST_GeomFromText('" . $footprint . "', 4326))) desc";
 	$results = pg_query($dbh, $query);
 	$keywords = array();
 	if(!$results) {
