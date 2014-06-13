@@ -1359,8 +1359,6 @@ function getRegions($dbh, $isShell, $footprint) {
 		error($dbh, $isShell, "\nFATAL : database connection error\n\n");
 	}
 	$result = array_values(array_unique(pg_fetch_all($results), SORT_REGULAR));
-
-	print_r($result);
 	
 	
 	if($result == false) {
