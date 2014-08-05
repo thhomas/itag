@@ -1323,7 +1323,7 @@ function getDepartements($dbh, $isShell, $footprint) {
 	$result = array_values(array_unique(pg_fetch_all($results), SORT_REGULAR));
 		
 	if($result == false) {
-		$query = "SELECT distinct(admin2) as nom_dept, admin2 as code_dept FROM geoname WHERE st_intersects(geom, ST_GeomFromText('" . $footprint . "', 4326))";
+		$query = "SELECT gn_name as nom_dept, code_local as code_dept FROM worldadm1level WHERE st_intersects(geom, ST_GeomFromText('" . $footprint . "', 4326))";
 		$results = pg_query($dbh, $query);
 		if(!$results) {
 			error($dbh, $isShell, "\nFATAL : database connection error\n\n");
@@ -1362,7 +1362,7 @@ function getRegions($dbh, $isShell, $footprint) {
 	
 	
 	if($result == false) {
-		$query = "SELECT distinct(admin1) as nom_region, admin1 as code_region FROM geoname WHERE st_intersects(geom, ST_GeomFromText('" . $footprint . "', 4326))";
+		$query = "SELECT gn_name as nom_region, code_local as code_reg FROM worldadm1level WHERE st_intersects(geom, ST_GeomFromText('" . $footprint . "', 4326))";
 		$results = pg_query($dbh, $query);
 		if(!$results) {
 			error($dbh, $isShell, "\nFATAL : database connection error\n\n");
