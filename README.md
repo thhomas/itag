@@ -1,193 +1,198 @@
-iTag
-====
+# iTag
 
-Automatically tag a geographical footprint against location, land cover, etc.
+[![Code Climate](https://codeclimate.com/github/jjrom/itag/badges/gpa.svg)](https://codeclimate.com/github/jjrom/itag)
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/jjrom/itag.svg)](http://isitmaintained.com/project/jjrom/itag "Average time to resolve an issue")
+[![Percentage of issues still open](http://isitmaintained.com/badge/open/jjrom/itag.svg)](http://isitmaintained.com/project/jjrom/itag "Percentage of issues still open")
 
-iTag can tag a footprint with the following information :
-* continents
-* countries
-* cities
-* regions and states
-* geophysical plates
-* volcanoes
+Semantic enhancement of Earth Observation data
+
+iTag is a library to tag a footprint with the following information :
+* political informations (i.e continents/countries/regions/states)
+* geological information (i.e. faults/plates/glaciers/volcanoes)
+* hydrological information (i.e. rivers)
 * land cover (i.e. forest, water, urban, cultivated, herbaceous, desert, snow, flooded)
 * population count
 
-You can access an online instance [here] (http://mapshup.info/itag) as a web service.
+You can access an online instance [here] (http://mapshup.com/projects/itag) as a web service.
 
-See [video capture of itag applied to Pleiades HR and Spot5 images database] (http://vimeo.com/51045597) and access trough [mapshup] (http://mapshup.info)
+See [video capture of itag applied to Pleiades HR and Spot5 images database] (http://vimeo.com/51045597) and access trough [mapshup] (http://mapshup.com/projects/mapshup)
 
-iTag is extensively used by [RESTo - REstful Semantic search Tool for geOspatial] (http://github.com/jjrom/resto)
+iTag is used by [RESTo - REstful Semantic search Tool for geOspatial] (http://github.com/jjrom/resto)
 
-Installation
-============
-
-We suppose that $ITAG_HOME is the directory containing this file.
-
-Prerequesites
--------------
+## Prerequesites
 
 * PHP (v5.3+) command line
-* PostgreSQL (v9.0+)
-* PostGIS (v1.5.1+)
-* GDAL (v1.8+) with python support (for land cover preparation)
+* PostgreSQL (v9.0+) with **unaccent** extension
+* PostGIS (v2.0+)
+* GDAL (v1.8+) with **python** support (for land cover preparation only)
 
 Note: iTag could work with lower version of the specified requirements.
 However there is no guaranty of success and unwanted result may occured !
 
-Configure postgresql
---------------------
+## Installation
 
-Edit the PostreSQL postgresql.conf and be sure that postgres accept tcp_ip connection.
+We suppose that : 
 
-        # Uncomment these two lines within postgesql.conf
-        listen_adresses = 'localhost'
-        port = 5432
+* $ITAG_HOME is the directory containing this file
+* $ITAG_DATA is the directory containing the datasources file (see below)
 
-Step by step
-------------
+### Get datasources
 
-1. Unzip data
+First create the $ITAG_DATA directory
+
+    export ITAG_DATA=$ITAG_HOME/data
+    mkdir $ITAG_DATA
+
+#### General data
+
+Retrieve coastlines from [Natural Earth](http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/)
         
-        # Note : $ITAG_HOME **must be** an absolute path (not relative !)
-        cd $ITAG_HOME/installation
-        unzip data.zip
+        cd $ITAG_DATA
+        wget http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/physical/ne_10m_coastline.zip
+        unzip ne_10m_coastline.zip
 
-2. Install database
+#### Political data
+
+Retrieve countries from [Natural Earth](http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/)
+        
+        cd $ITAG_DATA
+        wget http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/ne_10m_admin_0_countries.zip
+        unzip ne_10m_admin_0_countries.zip
+        
+Retrieve World Administrative Level 1 data from [Natural Earth](http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-1-states-provinces/)
+        
+        cd $ITAG_DATA
+        wget http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/ne_10m_admin_1_states_provinces.zip
+        unzip ne_10m_admin_1_states_provinces.zip
+        
+Retrieve toponyms from [geonames](http://geonames.org)
+
+        cd $ITAG_DATA
+        wget http://download.geonames.org/export/dump/allCountries.zip
+        wget http://download.geonames.org/export/dump/alternateNames.zip
+        unzip allCountries.zip
+        unzip alternateNames.zip
+        
+#### Geological data
+
+Retrieve geophysical data from [Mapping Tectonic Hot Spots](http://www.colorado.edu/geography/foote/maps/assign/hotspots/hotspots.html)
+
+        cd $ITAG_DATA
+        wget http://www.colorado.edu/geography/foote/maps/assign/hotspots/download/hotspots.zip
+        unzip hotspots.zip
+
+Retrieve glaciers from [Natural Earth](http://www.naturalearthdata.com/downloads/10m-physical-vectors/10m-glaciated-areas/)
+        
+        cd $ITAG_DATA
+        wget http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/physical/ne_10m_glaciated_areas.zip
+        unzip ne_10m_glaciated_areas.zip
+        
+#### Hydrological data
+
+Retrieve rivers data from [Natural Earth](http://www.naturalearthdata.com/downloads/10m-physical-vectors/10m-rivers-lake-centerlines/)
+        
+        cd $ITAG_DATA
+        wget http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/physical/ne_10m_rivers_lake_centerlines.zip
+        unzip ne_10m_rivers_lake_centerlines.zip
+        
+#### French data (from IGN GEOFLA®)
+        
+        # GEOFLA® 2015 v2.1 (http://professionnels.ign.fr/geofla#tab-3)
+        cd $ITAG_DATA
+        wget 'https://wxs-telechargement.ign.fr/oikr5jryiph0iwhw36053ptm/telechargement/inspire/GEOFLA_THEME-COMMUNE_2015_2$GEOFLA_2-1_COMMUNE_SHP_UTM20W84GUAD_D971_2015-12-01/file/GEOFLA_2-1_COMMUNE_SHP_UTM20W84GUAD_D971_2015-12-01.7z'
+        wget 'https://wxs-telechargement.ign.fr/oikr5jryiph0iwhw36053ptm/telechargement/inspire/GEOFLA_THEME-COMMUNE_2015_2$GEOFLA_2-1_COMMUNE_SHP_UTM20W84GUAD_D971_2015-12-01/file/GEOFLA_2-1_COMMUNE_SHP_UTM20W84GUAD_D971_2015-12-01.7z'
+        wget 'https://wxs-telechargement.ign.fr/oikr5jryiph0iwhw36053ptm/telechargement/inspire/GEOFLA_THEME-COMMUNE_2015_2$GEOFLA_2-1_COMMUNE_SHP_UTM20W84MART_D972_2015-12-01/file/GEOFLA_2-1_COMMUNE_SHP_UTM20W84MART_D972_2015-12-01.7z'
+        wget 'https://wxs-telechargement.ign.fr/oikr5jryiph0iwhw36053ptm/telechargement/inspire/GEOFLA_THEME-COMMUNE_2015_2$GEOFLA_2-1_COMMUNE_SHP_UTM22RGFG95_D973_2015-12-01/file/GEOFLA_2-1_COMMUNE_SHP_UTM22RGFG95_D973_2015-12-01.7z'
+        wget 'https://wxs-telechargement.ign.fr/oikr5jryiph0iwhw36053ptm/telechargement/inspire/GEOFLA_THEME-COMMUNE_2015_2$GEOFLA_2-1_COMMUNE_SHP_RGR92UTM40S_D974_2015-12-01/file/GEOFLA_2-1_COMMUNE_SHP_RGR92UTM40S_D974_2015-12-01.7z'
+        wget 'https://wxs-telechargement.ign.fr/oikr5jryiph0iwhw36053ptm/telechargement/inspire/GEOFLA_THEME-COMMUNE_2015_2$GEOFLA_2-1_COMMUNE_SHP_RGM04UTM38S_D976_2015-12-01/file/GEOFLA_2-1_COMMUNE_SHP_RGM04UTM38S_D976_2015-12-01.7z'
+        p7zip -d GEOFLA_2-1_COMMUNE_SHP_LAMB93_FXX_2015-12-01.7z
+        p7zip -d GEOFLA_2-1_COMMUNE_SHP_UTM20W84GUAD_D971_2015-12-01.7z
+        p7zip -d GEOFLA_2-1_COMMUNE_SHP_UTM20W84MART_D972_2015-12-01.7z
+        p7zip -d GEOFLA_2-1_COMMUNE_SHP_UTM22RGFG95_D973_2015-12-01.7z
+        p7zip -d GEOFLA_2-1_COMMUNE_SHP_RGR92UTM40S_D974_2015-12-01.7z
+        p7zip -d GEOFLA_2-1_COMMUNE_SHP_RGM04UTM38S_D976_2015-12-01.7z
+        
+#### Other data (i.e. marine areas, mountains area, etc.)
+        
+        # Marine areas
+        cd $ITAG_DATA
+        wget http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/physical/ne_10m_geography_marine_polys.zip
+        unzip ne_10m_geography_marine_polys.zip
+
+### Install database
 
         # Note : "password" must be the same as 
-        # the value of DB_PASSWORD key in $ITAG_HOME/config/config.php
+        # the value of 'password' parameter in $ITAG_HOME/include/config.php
         
-        cd $ITAG_HOME/installation
-        ./itagInstallDB.sh -F -d <path_to_postgis_directory> -p password
+        $ITAG_HOME/_install/installDB.sh -F -d <path_to_postgis_directory> -p password
 
-3. Populate database
+### Populate database
         
-        # 
-        # Note : Read this if you are using Fedora, Red Hat Enterprise Linux, CentOS,
-        # Scientific Linux, or one of the other distros that enable SELinux by default.
+**Note** : If you are using Fedora, Red Hat Enterprise Linux, CentOS, scientific Linux, or one of the other
+distros that enable SELinux by default you should run the following commands as root :
+
+        setenforce 0
+
+Run the following commands 
+
+        # General datasources
+        $ITAG_HOME/_install/installDatasources.sh -F -D $ITAG_DATA
+        
+        # Gazetteer
+        $ITAG_HOME/_install/installGazetteerDB.sh -F -D $ITAG_DATA
+        
+        # Wikipedia
+        # This step is optional and can only be performed if you have the geolocated wikipedia data (which probably you don't have :)
+        # In case of, these are the steps to follow in order to install this database within iTag
         #
-        # SELinux policies for PostgreSQL do not permit the server to read files outside
-        # the PostgreSQL data directory, or the file was created by a service covered by
-        # a targeted policy so it has a label that PostgreSQL isn't allowed to read from.
+        # Put the geolocated wikipedia data in $ITAG_DATA/wikipedia directory, then run the command
         #
-        # To make the itagPopulateDB.sh, run the following command as root
-        #
-        #   setenforce 0
-        # 
-        # Then after a successful itagPopulateDB.sh relaunch the command
-        #
-        #   setenforce 1
-        #
-        cd $ITAG_HOME/installation/
-        ./itagPopulateDB.sh -D data
-
-4. Download Global Land Cover 2000
-
-Go to ["Global Land Cover 2000" global product] (http://bioval.jrc.ec.europa.eu/products/glc2000/products.php) and download glc2000 GeoTIFF file.
-
-5. Configure
-
-Edit $ITAG_HOME/config/config.php (just follow the comments !)
-
-5. Precompute landcover
-
-        cd $ITAG_HOME/scripts/
-        ./prepareLandCover.php
-
-Note : depending on your server performance, the landcover computation can take a long time (more than two hours)
-
-
-Using iTag
-==========
-
-From the command line
----------------------
+        $ITAG_HOME/_install/installWikipediaDB.sh -D $ITAG_DATA/wikipedia
     
-        cd $ITAG_HOME
+### Install landcover database
 
-        php itag.php -h
+Download the world glc2000 GeoTIFF file from ["Global Land Cover 2000" global product](http://bioval.jrc.ec.europa.eu/products/glc2000/products.php)
 
-        #
-        #   USAGE : php itag.php [options] -f <footprint in WKT> (or -d <db connection info>)
-        #   OPTIONS:
-        #       -o [type] : output (json|pretty|insert|copy|hstore) - Note : if -d is choosen only 'hstore', 'insert' and 'copy' are used 
-        #       -H : display hierarchical continents/countries/regions/cities (otherwise keywords are "flat") 
-        #       -O : compute and order result by area of intersection
-        #       -c : Countries
-        #       -x : Continents
-        #       -C : Cities (main|all)
-        #       -R : Administrative level 1 (i.e. Regions and departements for France, USA states, etc.)
-        #       -p : Population
-        #       -g : Geophysical information (i.e. plates, volcanoes)
-        #       -l : Land Cover (i.e. Thematical content - forest, water, urban, etc.
-        #       -d : DB connection info - dbhost:dbname:dbschema:dbuser:dbpassword:dbport:tableName:identifierColumnName:geometryColumnName
-        #
+Then run the following :
 
-        #
-        # Tag footprint on Sicilia with countries, all cities and geophysical information
-        #
-        php itag.php -cg -C all -f "POLYGON((13.304225 37.47162,13.304225 38.433184,17.259303 38.433184,17.259303 37.47162,13.304225 37.47162))"
-        
-        #
-        # Tag footprint on Toulouse with French region, land cover and population
-        #
-        php itag.php -Rgp -f "POLYGON((1.350360 43.532822,1.350360 43.668522,1.515350 43.668522,1.515350 43.532822,1.350360 43.532822))"
+        $ITAG_HOME/_install/computeLandCover.php -I path_to_glc2000_tif_image
 
-        #
-        # Hierarchized Tag footprint intersecting France, Italy and Switzerland unordered and ordered 
-        #
-        php itag.php -c -H -f "POLYGON((6.487426757812523 45.76081241294796,6.487426757812523 46.06798615804025,7.80578613281244 46.06798615804025,7.80578613281244 45.76081241294796, 6.487426757812523 45.76081241294796))"
-        php itag.php -c -H -O -f "POLYGON((6.487426757812523 45.76081241294796,6.487426757812523 46.06798615804025,7.80578613281244 46.06798615804025,7.80578613281244 45.76081241294796, 6.487426757812523 45.76081241294796))"
+**Note** : depending on your server performance, the landcover computation can take a long time (more than two hours)
 
+### Install Gridded Population of the World database
 
-        #
-        # Tag footprints from table "products" of database "test"
-        #
-        # With the following parameters:
-        #       - dbhost : localhost
-        #       - dbname : test
-        #       - dbschema : public
-        #       - dbuser : postgres
-        #       - dbpassword : postgres
-        #       - dbport : 5432
-        #       - tableName : products
-        #       - identifierColumnName : identifier
-        #       - geometryColumnName : footprint
-        #
-        #
-        # Note : Output is set to hstore and redirect to /tmp/hstore.sql
-        #
-        php itag.php -d localhost:test:public:postgres:postgres:5432:products:identifier:footprint -c -o hstore > /tmp/hstore.sql
+Download the Gridded Population of the World from [SEDAC](http://sedac.ciesin.columbia.edu/data/set/gpw-v3-population-count-future-estimates/metadata)
+Then run the following :
 
+        $ITAG_HOME/_install/installGPW.php -f asciigridfile
 
-From Web service
-----------------
-        
-We suppose that $ITAG_HOME is accessible to http://localhost/itag/ in Apache.
+**Note** : this take a loooooong time
 
-To tag footprint on Toulouse with geophysical information and all cities with a pretty GeoJSON output, open this url within you browser
+### Deploy application
+
+        $ITAG_HOME/_install/deploy.sh -s $ITAG_HOME -t $ITAG_TARGET
+
+## Using iTag
+
+We suppose that $ITAG_TARGET is accessible to http://localhost/itag/ in Apache.
+
+To tag footprint on Toulouse with geological information and all cities with a pretty GeoJSON output, open this url within you browser
     
-        http://localhost/itag/?geophysical=true&countries=true&cities=all&output=pretty&footprint=POLYGON((1.350360%2043.532822,1.350360%2043.668522,1.515350%2043.668522,1.515350%2043.532822,1.350360%2043.532822))
+        http://localhost/itag/?taggers=Political&_pretty=true&footprint=POLYGON((1.350360%2043.532822,1.350360%2043.668522,1.515350%2043.668522,1.515350%2043.532822,1.350360%2043.532822))
 
 Available parameters for Web service are :
-* &countries=true
-* &cities=main (or &cities=all)
-* &population=true
-* &geophysical=true
-* &regions=true
-* &landcover=true
+* &taggers=Political,Geology,Hydrology,Landcover
+* &pretty=true
 
-You can check this [running instance] (http://mapshup.info/itag/) - (note : landcover is disabled on this server)
-
+You can check this [running instance] (http://mapshup.com/projects/itag/)
 
 Examples :
 
-    Tag footprint on Toulouse with geophysical information and all cities with a pretty GeoJSON output
+    Tag footprint on Toulouse with political and geological information and with a pretty GeoJSON output
     
-        http://mapshup.info/itag/?geophysical=true&countries=true&cities=all&output=pretty&footprint=POLYGON((1.350360%2043.532822,1.350360%2043.668522,1.515350%2043.668522,1.515350%2043.532822,1.350360%2043.532822))
+        http://mapshup.com/projects/itag/?taggers=Political,Geology&_pretty=true&footprint=POLYGON((1.350360%2043.532822,1.350360%2043.668522,1.515350%2043.668522,1.515350%2043.532822,1.350360%2043.532822))
 
 
-    Tag footprint intersecting France, Italy and Switzerland with cities, regions and states. Hierarchical result as pretty GeoJSON output
+    Tag footprint intersecting France, Italy and Switzerland with political information. Hierarchical result as pretty GeoJSON output
     
-        http://mapshup.info/itag/?regions=true&hierarchical=true&ordered=true&countries=true&cities=all&output=pretty&footprint=POLYGON((6.487426757812523%2045.76081241294796,6.487426757812523%2046.06798615804025,7.80578613281244%2046.06798615804025,7.80578613281244%2045.76081241294796,6.487426757812523%2045.76081241294796))
+        http://mapshup.com/projects/itag/?taggers=Political&footprint=POLYGON((6.487426757812523%2045.76081241294796,6.487426757812523%2046.06798615804025,7.80578613281244%2046.06798615804025,7.80578613281244%2045.76081241294796,6.487426757812523%2045.76081241294796))
