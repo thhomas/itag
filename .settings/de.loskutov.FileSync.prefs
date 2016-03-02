@@ -1,7 +1,0 @@
-WARNING=DO NOT MODIFY THIS FILE IF YOU DON'T UNDERSTAND
-defaultDestination=/Volumes/Vol-Users/Users/ttilak/Sites/itag
-defaultVariables=
-eclipse.preferences.version=1
-includeTeamPrivateFiles=false
-map|0=/|,|include/;itag.php|.gitignore;.project;LICENSE;NOTICE;README.md;_install/;config/;functions.php;index.php;install/;scripts/|,
-useCurrentDateForDestinationFiles=false
