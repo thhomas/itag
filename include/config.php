@@ -48,12 +48,12 @@ return array(
         /*
          * Database name
          */
-        'dbname' => 'itag',
+        'dbname' => 'itag2',
         
         /*
          * Host - if not specified socket connection
          */
-        //'host' => 'localhost',
+        'host' => 'espace.toulouse.ign.fr',
         
         /*
          * Port

@@ -22,7 +22,6 @@ require 'Taggers/Tagger_LandCover.php';
 require 'Taggers/Tagger_Political.php';
 require 'Taggers/Tagger_Population.php';
 require 'Taggers/Tagger_Physical.php';
-require 'Taggers/Tagger_French.php';
 class iTag {
 
     /*

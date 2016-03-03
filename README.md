@@ -99,7 +99,7 @@ Retrieve rivers data from [Natural Earth](http://www.naturalearthdata.com/downlo
         
         # GEOFLA® 2015 v2.1 (http://professionnels.ign.fr/geofla#tab-3)
         cd $ITAG_DATA
-        wget 'https://wxs-telechargement.ign.fr/oikr5jryiph0iwhw36053ptm/telechargement/inspire/GEOFLA_THEME-COMMUNE_2015_2$GEOFLA_2-1_COMMUNE_SHP_UTM20W84GUAD_D971_2015-12-01/file/GEOFLA_2-1_COMMUNE_SHP_UTM20W84GUAD_D971_2015-12-01.7z'
+        wget 'https://wxs-telechargement.ign.fr/oikr5jryiph0iwhw36053ptm/telechargement/inspire/GEOFLA_THEME-COMMUNE_2015_2$GEOFLA_2-1_COMMUNE_SHP_LAMB93_FXX_2015-12-01/file/GEOFLA_2-1_COMMUNE_SHP_LAMB93_FXX_2015-12-01.7z'
         wget 'https://wxs-telechargement.ign.fr/oikr5jryiph0iwhw36053ptm/telechargement/inspire/GEOFLA_THEME-COMMUNE_2015_2$GEOFLA_2-1_COMMUNE_SHP_UTM20W84GUAD_D971_2015-12-01/file/GEOFLA_2-1_COMMUNE_SHP_UTM20W84GUAD_D971_2015-12-01.7z'
         wget 'https://wxs-telechargement.ign.fr/oikr5jryiph0iwhw36053ptm/telechargement/inspire/GEOFLA_THEME-COMMUNE_2015_2$GEOFLA_2-1_COMMUNE_SHP_UTM20W84MART_D972_2015-12-01/file/GEOFLA_2-1_COMMUNE_SHP_UTM20W84MART_D972_2015-12-01.7z'
         wget 'https://wxs-telechargement.ign.fr/oikr5jryiph0iwhw36053ptm/telechargement/inspire/GEOFLA_THEME-COMMUNE_2015_2$GEOFLA_2-1_COMMUNE_SHP_UTM22RGFG95_D973_2015-12-01/file/GEOFLA_2-1_COMMUNE_SHP_UTM22RGFG95_D973_2015-12-01.7z'

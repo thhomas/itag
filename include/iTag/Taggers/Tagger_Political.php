@@ -259,7 +259,24 @@ class Tagger_Political extends Tagger {
         );
         
         if ($this->addToponyms) {
-            $state['toponyms'] = $this->getToponyms($element['wkb_geom']);
+            if ($element['isoa3'] = 'FRA') {
+                $query = 'SELECT 1 FROM pg_namespace WHERE nspname = \'france\'';
+                $result = $this->query($query);
+                $result = pg_fetch_row($result);
+                if($result[0] == '1') {
+                  $state['toponyms'] = $this->getFrenchToponyms($element['wkb_geom']);
+                  array_push($this->references, array(
+                      'dataset' => 'GEOFLA® 2015 v2.1',
+                      'author' => 'IGN',
+                      'license' => 'Free of Charge',
+                      'url' => 'http://professionnels.ign.fr/geofla'
+                  ));
+                } else {
+                  $state['toponyms'] = $this->getToponyms($element['wkb_geom']);
+                }
+            } else {
+                $state['toponyms'] = $this->getToponyms($element['wkb_geom']);
+            }
         }
         
         array_push($states, $state);
@@ -278,13 +295,33 @@ class Tagger_Political extends Tagger {
         while ($result = pg_fetch_assoc($results)) {
             $toponyms[] = array(
                 'name' => $result['name'],
-                'geo:lon' => (integer) $result['longitude'],
-                'geo:lat' => (integer) $result['latitude'],
+                'geo:lon' => $result['longitude'],
+                'geo:lat' => $result['latitude'],
                 'fcode' => $result['fcode'],
                 'population' => (integer) $result['population']
             );      
         }
         return $toponyms;
     }
-    
+
+    /**
+     * Add french toponyms to political array
+     *
+     * @param string $wkb geometry as wkb
+     */
+    private function getFrenchToponyms($wkb) {
+      $toponyms = array();
+      $query = 'SELECT nom_com as name, x_centroid as longitude, y_centroid as latitude, code_com as fcode, population FROM france.commune WHERE st_intersects(geom, \'' . $wkb . '\') ORDER BY population DESC';
+      $results = $this->query($query);
+      while ($result = pg_fetch_assoc($results)) {
+        $toponyms[] = array(
+            'name' => ucwords(strtolower($result['name']), ' -\''),
+            'geo:lon' => $result['longitude'],
+            'geo:lat' => $result['latitude'],
+            'fcode' => $result['fcode'],
+            'population' => (integer) $result['population']
+        );
+      }
+      return $toponyms;
+    }
 }

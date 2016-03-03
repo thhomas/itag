@@ -63,6 +63,25 @@ shp2pgsql -g geom -a -W LATIN1 -s 2975:4326 -I $DATADIR/GEOFLA_2-1_COMMUNE_SHP_R
 shp2pgsql -g geom -a -W LATIN1 -s 2970:4326 -I $DATADIR/GEOFLA_2-1_COMMUNE_SHP_UTM20W84GUAD_D971_2015-12-01/GEOFLA/1_DONNEES_LIVRAISON_2015/GEOFLA_2-1_SHP_UTM20W84GUAD_D971-ED152/COMMUNE/COMMUNE.shp france.commune | psql -d $DB -U $SUPERUSER -h $HOSTNAME
 shp2pgsql -g geom -a -W LATIN1 -s 2973:4326 -I $DATADIR/GEOFLA_2-1_COMMUNE_SHP_UTM20W84MART_D972_2015-12-01/GEOFLA/1_DONNEES_LIVRAISON_2015/GEOFLA_2-1_SHP_UTM20W84MART_D972-ED152/COMMUNE/COMMUNE.shp france.commune | psql -d $DB -U $SUPERUSER -h $HOSTNAME
 shp2pgsql -g geom -a -W LATIN1 -s 2972:4326 -I $DATADIR/GEOFLA_2-1_COMMUNE_SHP_UTM22RGFG95_D973_2015-12-01/GEOFLA/1_DONNEES_LIVRAISON_2015/GEOFLA_2-1_SHP_UTM22RGFG95_D973-ED152/COMMUNE/COMMUNE.shp france.commune | psql -d $DB -U $SUPERUSER -h $HOSTNAME
+
+# update geometries in EPSG:4326
+psql -d $DB -U $SUPERUSER -h $HOSTNAME << EOF
+ALTER TABLE france.commune ALTER COLUMN x_centroid TYPE decimal;
+ALTER TABLE france.commune ALTER COLUMN y_centroid TYPE decimal;
+ALTER TABLE france.commune ALTER COLUMN x_chf_lieu TYPE decimal;
+ALTER TABLE france.commune ALTER COLUMN y_chf_lieu TYPE decimal;
+UPDATE france.commune SET x_centroid = ST_X(ST_Transform(ST_SetSRID(ST_MakePoint(x_centroid,y_centroid), 2154), 4326)) WHERE code_reg NOT IN ('01', '02', '03', '04', '06');
+UPDATE france.commune SET y_centroid = ST_Y(ST_Transform(ST_SetSRID(ST_MakePoint(x_centroid,y_centroid), 2154), 4326)) WHERE code_reg NOT IN ('01', '02', '03', '04', '06');
+UPDATE france.commune SET x_chf_lieu = ST_X(ST_Transform(ST_SetSRID(ST_MakePoint(x_chf_lieu,y_chf_lieu), 2154), 4326)) WHERE code_reg NOT IN ('01', '02', '03', '04', '06');
+UPDATE france.commune SET y_chf_lieu = ST_Y(ST_Transform(ST_SetSRID(ST_MakePoint(x_chf_lieu,y_chf_lieu), 2154), 4326)) WHERE code_reg NOT IN ('01', '02', '03', '04', '06');
+
+UPDATE france.commune SET x_centroid = ST_X(ST_Transform(ST_SetSRID(ST_MakePoint(x_centroid,y_centroid), 2970), 4326)) WHERE code_reg = '01';
+UPDATE france.commune SET x_centroid = ST_X(ST_Transform(ST_SetSRID(ST_MakePoint(x_centroid,y_centroid), 2973), 4326)) WHERE code_reg = '02';
+UPDATE france.commune SET x_centroid = ST_X(ST_Transform(ST_SetSRID(ST_MakePoint(x_centroid,y_centroid), 2972), 4326)) WHERE code_reg = '03';
+UPDATE france.commune SET x_centroid = ST_X(ST_Transform(ST_SetSRID(ST_MakePoint(x_centroid,y_centroid), 2975), 4326)) WHERE code_reg = '04';
+UPDATE france.commune SET x_centroid = ST_X(ST_Transform(ST_SetSRID(ST_MakePoint(x_centroid,y_centroid), 4471), 4326)) WHERE code_reg = '06';
+EOF
+
 psql -d $DB -U $SUPERUSER -h $HOSTNAME << EOF
 CREATE INDEX idx_communefrance_commune ON france.commune (nom_com);
 CREATE INDEX idx_communefrance_dept ON france.commune (nom_dept);
