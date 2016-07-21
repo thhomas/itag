@@ -259,7 +259,7 @@ class Tagger_Political extends Tagger {
         );
         
         if ($this->addToponyms) {
-            if ($element['isoa3'] = 'FRA') {
+            if ($element['isoa3'] == 'FRA') {
                 $query = 'SELECT 1 FROM pg_namespace WHERE nspname = \'france\'';
                 $result = $this->query($query);
                 $result = pg_fetch_row($result);

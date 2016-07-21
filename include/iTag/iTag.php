@@ -253,7 +253,7 @@ class iTag {
      * @return array
      */
     private function wktToCoordinates($footprint) {
-        $pairs = explode(',', str_replace('POLYGON((', ' ', str_replace('))', ' ', strtoupper($footprint))));
+        $pairs = explode(',', str_replace('POLYGON((', ' ', str_replace('POLYGON ((', str_replace('))', ' ', strtoupper($footprint)))));
         $coordinates = array();
         for ($i = 0, $ii = count($pairs); $i < $ii; $i++) {
             $lonlat = explode(' ', trim($pairs[$i]));

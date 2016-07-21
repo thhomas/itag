@@ -36,7 +36,11 @@ class iTagLauncher {
             $taggers[trim($value)] = array();
         }
         try {
-            $this->answer($this->json_format($this->itag->tag($params['metadata'], $taggers)), 200);
+            if (!$this->outputFormat) {
+                $this->answer($this->json_format($this->itag->tag($params['metadata'], $taggers)), 200);
+            } else if($this->outputFormat="geojson") {
+                $this->answer($this->geojson_format($this->itag->tag($params['metadata'], $taggers)), 200);
+            }
         } catch (Exception $e) {
             $this->answer($this->json_format(array('ErrorMessage' => $e->getMessage(), 'ErrorCode' =>  $e->getCode())), $e->getCode());
         }   
@@ -69,6 +73,7 @@ class iTagLauncher {
      */
     private function getParams() {
         $this->pretty = filter_input(INPUT_GET, '_pretty', FILTER_VALIDATE_BOOLEAN);
+        $this->outputFormat = filter_input(INPUT_GET, 'outputFormat', FILTER_SANITIZE_STRING);
         return array(
             'metadata' => array(
                 'footprint' => filter_input(INPUT_GET, 'footprint', FILTER_SANITIZE_STRING),
@@ -160,7 +165,27 @@ class iTagLauncher {
         }
      
     }
-    
+
+    /**
+     * Format a flat JSON string to make it more human-readable
+     *
+     * @param array $json JSON as an array
+     *
+     * @return string Indented GeoJSON version of the original JSON string
+     */
+    private function geojson_format($json) {
+      
+      $geojson = array(
+          'type' => 'FeatureCollection',
+          'features' => array(
+              'type' => 'Feature',
+              'geometry' => $this->wktPolygon2GeoJSONGeometry($json['footprint']),
+              'properties' => $json['content']
+          )
+      );
+      return $this->json_format($geojson);
+
+    }
     /**
      * Pretty print a json string
      * Code from https://github.com/ryanuber/projects/blob/master/PHP/JSON/jsonpp.php
@@ -185,5 +210,32 @@ class iTagLauncher {
         }
         return $result;
     }
+    
+    /**
+     *
+     * Returns GeoJSON geometry from a WKT POLYGON
+     *
+     * Example of WKT POLYGON :
+     *     POLYGON((-180.0044642857 89.9955356663,-180.0044642857 87.9955356727,-178.0044642921 87.9955356727,-178.0044642921 89.9955356663,-180.0044642857 89.9955356663))
+     *
+     * @param <string> $wkt : WKT
+     *
+     */
+    private function wktPolygon2GeoJSONGeometry($wkt) {
+      $rep = array("(", ")", "multi", "polygon");
+      $pairs = preg_split('/,/', str_replace($rep, "", strtolower($wkt)));
+      $linestring = array();
+      for ($i = 0; $i < count($pairs); $i++) {
+        $coords = preg_split('/ /', trim($pairs[$i]));
+        $x = floatval($coords[0]);
+        $y = floatval($coords[1]);
+        array_push($linestring, array($x, $y));
+      }
+      return array(
+          'type' => "Polygon",
+          'coordinates' => array($linestring)
+      );
+    }
+    
 
 }
