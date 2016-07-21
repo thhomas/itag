@@ -148,6 +148,9 @@ Run the following commands
         # Put the geolocated wikipedia data in $ITAG_DATA/wikipedia directory, then run the command
         #
         $ITAG_HOME/_install/installWikipediaDB.sh -D $ITAG_DATA/wikipedia
+        
+        # French data sources (from GEOFLA®)
+        $ITAG_HOME/_install/installFrenchDatasources.sh -F -D $ITAG_DATA
     
 ### Install landcover database
 
