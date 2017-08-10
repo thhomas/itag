@@ -177,11 +177,11 @@ class iTagLauncher {
       
       $geojson = array(
           'type' => 'FeatureCollection',
-          'features' => array(
+          'features' => array(array(
               'type' => 'Feature',
               'geometry' => $this->wktPolygon2GeoJSONGeometry($json['footprint']),
               'properties' => $json['content']
-          )
+          ))
       );
       return $this->json_format($geojson);
 

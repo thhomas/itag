@@ -16,52 +16,52 @@
  */
 
 return array(
-    
+
     /*
      * General configuration
      */
     'general' => array(
-        
+
         /*
          * Maximum area allowed (in square kilometers)
-         * for LandCover computation 
+         * for LandCover computation
          */
         'areaLimit' => 200000,
-        
+
         /*
          * Return WKT geometries
          */
         'returnGeometries' => false,
-        
+
         /*
          * Tolerance value for simplication (in degrees)
          */
         'geometryTolerance' => 0.1
-        
+
     ),
-    
+
     /*
      * Database configuration
      */
     'database' => array(
-        
+
         /*
          * Database name
          */
         'dbname' => 'itag',
-        
+
         /*
          * Host - if not specified socket connection
          */
-        //'host' => 'localhost',
-        
+        'host' => 'db',
+
         /*
          * Port
          */
         'port' => '5432',
-        
+
         /*
-         * Database user with READ privileges 
+         * Database user with READ privileges
          */
         'user' => 'itag',
         'password' => 'itag'

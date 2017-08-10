@@ -1,0 +1,43 @@
+version: "3"
+services:
+  itag:
+    container_name: itag
+    build:
+      context: .
+      dockerfile: Dockerfile.itag
+      args:
+        http_proxy: ${http_proxy}
+    ports:
+      - 8083:80
+    volumes:
+      - ./:/var/www/html
+      - itag-data:/itag
+    networks:
+      - itag-network
+    depends_on:
+      - db
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+      args:
+        http_proxy: ${http_proxy}
+    container_name: itag-db
+    environment:
+      - POSTGRES_USER=itag
+      - POSTGRES_PASSWORD=itag
+      - POSTGRES_DB=itag
+    volumes:
+      - itag-db-data:/var/lib/postgresql/data
+      - ./_install/install.sh:/docker-entrypoint-initdb.d/init-db.sh
+    networks:
+      - itag-network
+
+volumes:
+  itag-db-data:
+    external: true
+  itag-data:
+    external: true
+
+networks:
+  itag-network:
